@@ -39,9 +39,23 @@ O servidor mantém salas, respostas, pontuação e perguntas em memória. Salas 
 
 Descubra o IP local do computador que está executando o projeto e compartilhe `http://SEU_IP:5173` com os amigos conectados à mesma rede. Libere as portas 5173 e 3001 no firewall se necessário.
 
+## Deploy na internet
+
+O frontend publicado no Cloudflare Pages não executa o servidor Node/Socket.IO deste projeto. É necessário publicar a pasta `server` em um serviço que mantenha um processo Node, como Render, Railway, Fly.io ou um VPS.
+
+Depois de publicar o backend, configure no Cloudflare Pages uma variável de ambiente para o build:
+
+```text
+VITE_SOCKET_URL=https://SEU-BACKEND.exemplo.com
+```
+
+Faça um novo deploy do Pages depois de salvar a variável. O endereço precisa apontar para o backend Socket.IO, não apenas para a página do frontend. O backend deve permitir CORS para o domínio do Pages e manter suporte a WebSocket.
+
+Sem essa variável, o desenvolvimento local usa `http://localhost:3001`; em produção o navegador tenta a origem do próprio Pages, onde não existe o servidor Socket.IO. Por isso os botões parecem lentos ou não respondem.
+
 ## Compartilhar temporariamente pela internet
 
-Use um túnel temporário como Cloudflare Tunnel ou ngrok apontando para a porta 5173. Para clientes em outra origem, defina `VITE_SOCKET_URL` com a URL pública do servidor Socket.IO antes do build. Como as partidas vivem apenas na memória, reiniciar o processo encerra as salas.
+Use um túnel temporário como Cloudflare Tunnel ou ngrok apontando para a porta 3001 do servidor Socket.IO. Defina `VITE_SOCKET_URL` com a URL pública do servidor antes do build. Como as partidas vivem apenas na memória, reiniciar o processo encerra as salas.
 
 ## Testes
 

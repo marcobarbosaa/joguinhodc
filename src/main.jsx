@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { io } from 'socket.io-client';
 import './styles.css';
 
-const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001', { autoConnect: false });
+const socketUrl = import.meta.env.VITE_SOCKET_URL || (import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin);
+const socket = io(socketUrl, { autoConnect: false, timeout: 5000, reconnectionAttempts: 3, reconnectionDelay: 1000 });
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 3 });
 const categories = ['Corpo humano', 'Ciência', 'Espaço', 'Geografia', 'História', 'Esportes', 'Tecnologia', 'Animais', 'Curiosidades', 'Dinheiro', 'Mundo', 'Cultura'];
 function readSavedSession() {
@@ -46,7 +47,10 @@ function App() {
       setError(message);
     };
     const onConnectionError = () => {
-      if (!recovering) return;
+      if (!recovering) {
+        setError('Servidor da partida indisponível. Configure VITE_SOCKET_URL no deploy.');
+        return;
+      }
       socket.disconnect();
       localStorage.removeItem('palpiteiro_session');
       setRecovering(false);
