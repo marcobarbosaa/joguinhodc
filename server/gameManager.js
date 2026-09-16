@@ -1,7 +1,7 @@
 import questions from './questions.json' with { type: 'json' };
 
 const MAX_PLAYERS = 10;
-const MIN_PLAYERS = 2;
+const MIN_PLAYERS = 1;
 const COLORS = ['#ff6b5f', '#ffd166', '#4ecdc4', '#7c83fd', '#f78fb3', '#6dd47e', '#f7a072', '#a78bfa', '#5dade2', '#e59866'];
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -66,8 +66,9 @@ export class GameManager {
   }
 
   start(room, socketId, settings) {
+    if (!room) throw new Error('Essa sala não está mais disponível.');
     if (room.hostId !== socketId) throw new Error('Apenas o host pode iniciar.');
-    if (room.players.length < MIN_PLAYERS) throw new Error('É preciso ter pelo menos 2 jogadores.');
+    if (room.players.length < MIN_PLAYERS) throw new Error(`É preciso ter pelo menos ${MIN_PLAYERS} jogador.`);
     room.totalRounds = [5, 10, 15, 20].includes(Number(settings?.rounds)) ? Number(settings.rounds) : 5;
     room.seconds = [15, 30, 45, 60].includes(Number(settings?.seconds)) ? Number(settings.seconds) : 30;
     room.categories = Array.isArray(settings?.categories) ? settings.categories.filter(Boolean) : [];

@@ -34,3 +34,14 @@ test('rejeita segunda resposta do mesmo jogador', () => {
   games.submit(room, 'a', 100);
   assert.throws(() => games.submit(room, 'a', 101), /já respondeu/);
 });
+
+test('permite iniciar uma partida para testar as perguntas sozinho', () => {
+  const games = new GameManager();
+  const room = games.createRoom('Ana', 'a');
+  room.hostId = 'a';
+
+  games.start(room, 'a', { rounds: 5, seconds: 30 });
+
+  assert.equal(room.phase, 'question');
+  assert.ok(room.question.question);
+});
