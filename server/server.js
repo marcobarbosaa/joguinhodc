@@ -24,6 +24,17 @@ io.on('connection', (socket) => {
   socket.on('start_game', (settings) => { try { const room = games.getRoom(socket.data.roomCode); if (!room) throw new Error('Essa sala não está mais disponível.'); games.start(room, socket.id, settings); sendRoom(room); broadcastQuestionTimer(room); } catch (error) { fail(socket, error); } });
   socket.on('submit_answer', ({ value } = {}) => { try { const room = games.getRoom(socket.data.roomCode); const allAnswered = games.submit(room, socket.id, Number(value)); socket.emit('answer_received'); if (allAnswered) { games.finish(room); sendRoom(room); } } catch (error) { fail(socket, error); } });
   socket.on('next_round', () => { try { const room = games.getRoom(socket.data.roomCode); games.next(room, socket.id); sendRoom(room); if (room.phase === 'question') broadcastQuestionTimer(room); } catch (error) { fail(socket, error); } });
+  socket.on('back_to_lobby', (ack) => { try { const room = games.getRoom(socket.data.roomCode); games.backToLobby(room); sendRoom(room); ack?.(); } catch (error) { fail(socket, error); } });
+  socket.on('leave_room', (ack) => {
+    const code = socket.data.roomCode;
+    if (!code) return ack?.();
+    sockets.delete(socket.id);
+    socket.leave(code);
+    socket.data.roomCode = null;
+    socket.data.playerId = null;
+    sendRoom(games.leave(socket.id));
+    ack?.();
+  });
   socket.on('disconnect', () => { const code = sockets.get(socket.id); sockets.delete(socket.id); const room = games.getRoom(code); if (!room) return; const player = room.players.find((item) => item.id === socket.id); if (player) player.connected = false; setTimeout(() => { const current = games.getRoom(code); if (!current || !current.players.some((item) => item.id === socket.id)) return; const updated = games.leave(socket.id); sendRoom(updated); }, 5000); sendRoom(room); });
 });
 

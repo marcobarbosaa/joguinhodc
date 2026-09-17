@@ -80,8 +80,14 @@ export class GameManager {
 
   pickQuestions(room) {
     const pool = room.categories.length ? questions.filter((item) => room.categories.includes(item.category)) : questions;
-    const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    return Array.from({ length: room.totalRounds }, (_item, index) => shuffled[index % shuffled.length]);
+    const unique = [...new Map(pool.map((item) => [item.question, item])).values()];
+    if (unique.length < room.totalRounds) throw new Error(`As categorias escolhidas têm apenas ${unique.length} perguntas únicas; selecione mais categorias ou menos rodadas.`);
+    const shuffled = [...unique];
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+    }
+    return shuffled.slice(0, room.totalRounds);
   }
 
   beginRound(room) {
@@ -123,6 +129,20 @@ export class GameManager {
     if (room.phase !== 'result') throw new Error('A rodada ainda não terminou.');
     if (room.round >= room.totalRounds) { room.phase = 'finished'; return room; }
     return this.beginRound(room);
+  }
+
+  backToLobby(room) {
+    if (!room) throw new Error('Essa sala não está mais disponível.');
+    clearTimeout(room.timer);
+    room.timer = null;
+    room.phase = 'lobby';
+    room.round = 0;
+    room.question = null;
+    room.answers = new Map();
+    room.scores = new Map();
+    room.selectedQuestions = [];
+    delete room.result;
+    return room;
   }
 
   leave(socketId) {

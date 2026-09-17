@@ -45,3 +45,32 @@ test('permite iniciar uma partida para testar as perguntas sozinho', () => {
   assert.equal(room.phase, 'question');
   assert.ok(room.question.question);
 });
+
+test('seleciona perguntas únicas durante toda a partida', () => {
+  const { room } = setup();
+  const selected = room.selectedQuestions.map((question) => question.question);
+
+  assert.equal(new Set(selected).size, selected.length);
+});
+
+test('rejeita categorias com perguntas únicas insuficientes', () => {
+  const games = new GameManager();
+  const room = games.createRoom('Ana', 'a');
+  room.hostId = 'a';
+
+  assert.throws(() => games.start(room, 'a', { rounds: 20, seconds: 30, categories: ['Categoria inexistente'] }), /perguntas únicas/);
+});
+
+test('volta a sala ao lobby sem remover os jogadores', () => {
+  const { games, room } = setup();
+  room.phase = 'finished';
+  room.result = { answer: 10 };
+
+  games.backToLobby(room);
+
+  assert.equal(room.phase, 'lobby');
+  assert.equal(room.players.length, 2);
+  assert.equal(room.question, null);
+  assert.equal(room.result, undefined);
+  assert.equal(room.selectedQuestions.length, 0);
+});
