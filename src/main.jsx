@@ -105,8 +105,85 @@ function App() {
   return null;
 }
 
-function Shell({ children, eyebrow = 'TÃO JOGANDO AINDA?', exit }) { return <main className="app"><div className="grain" /><div className="game-texture" aria-hidden="true"><span>???</span><span>+1</span><span>≈</span><span>42</span></div><header className="topbar"><span className="brand"><i />{eyebrow}</span><div className="topbar-actions">{exit && <button className="quit" onClick={exit}>Sair do jogo <b>×</b></button>}<span className="live-dot">● AO VIVO</span></div></header>{children}</main>; }
-function Home({ name, setName, code, setCode, create, join, error }) { return <Shell><section className="home-screen"><div className="home-copy"><p className="kicker">PARTY GAME DE PALPITES</p><h1>TÃO JOGANDO<br /><em>AINDA?</em></h1><p className="lede">Chuta um número. Tenta não passar vergonha.</p><div className="fake-board" aria-hidden="true"><span>PALPITE <b>87.420</b></span><span>RESPOSTA <b>???</b></span><span>DIFERENÇA <b>+1</b></span></div></div><div className="panel entrance game-panel"><div className="panel-stamp">BORA JOGAR?</div><h2>Escolhe um apelido<br />e chama a galera.</h2><label>SEU APELIDO<input value={name} maxLength="18" onChange={(event) => setName(event.target.value)} placeholder="Como te chamam?" /></label><button className="primary" onClick={create}>+ Criar sala <b>→</b></button><div className="or"><span>já tem uma sala?</span></div><label className="code-label">CÓDIGO DA SALA<div className="join-row"><input value={code} maxLength="6" onChange={(event) => setCode(event.target.value.toUpperCase())} placeholder="K7P4X2" /><button className="secondary" onClick={join}>Entrar <b>→</b></button></div></label>{error && <p className="error">{error}</p>}</div></section><div className="home-facts"><span><b>01–10</b> jogadores</span><i>•</i><span>salas privadas</span><i>•</i><span>sem cadastro</span></div></Shell>; }
+function Shell({ children, eyebrow = 'TÃO JOGANDO AINDA?', exit, hideHeader = false }) {
+  return (
+    <main className="app">
+      <div className="grain" />
+
+      <div className="game-texture" aria-hidden="true">
+        <span>???</span>
+        <span>+1</span>
+        <span>≈</span>
+        <span>42</span>
+      </div>
+
+      {!hideHeader && (
+        <header className="topbar">
+          <span className="brand">
+            <i />
+            {eyebrow}
+          </span>
+
+          <div className="topbar-actions">
+            {exit && (
+              <button className="quit" onClick={exit}>
+                Sair do jogo <b>×</b>
+              </button>
+            )}
+
+            <span className="live-dot">● AO VIVO</span>
+          </div>
+        </header>
+      )}
+
+      {children}
+    </main>
+  );
+}
+function Home({ name, setName, code, setCode, create, join, error }) {
+  const showcase = [
+    { name: 'MATEUS', value: '200.000', status: 'MANDOU LONGE', tone: 'violet' },
+    { name: 'MARCO', value: '12.500', status: 'PALPITE TRAVADO', tone: 'coral' },
+    { name: 'JÃO', value: '84.320', status: 'RESPOSTA TRAVADA', tone: 'blue', featured: true },
+    { name: 'ATOS', value: '???', status: 'PENSANDO...', tone: 'green' },
+    { name: 'WERYDY', value: '42', status: 'NA MOSCA!  +2', tone: 'yellow' }
+  ];
+
+  return <Shell hideHeader>
+    <section className="home-stage">
+      <div className="home-hero">
+        <p className="kicker">PARTY GAME DE PALPITES</p>
+        <h1>TÃO JOGANDO<br /><em>AINDA?</em></h1>
+        <p className="lede">The planet enet enenet.</p>
+
+        <div className="home-actions">
+          <label className="nickname-field">
+            <span>SEU APELIDO</span>
+            <input value={name} maxLength="18" onChange={(event) => setName(event.target.value)} placeholder="Como te chamam?" />
+          </label>
+          <button className="primary create-room" onClick={create}>Criar sala <b>→</b></button>
+          <div className="existing-room">
+            <span>JÁ TEM UMA SALA?</span>
+            <div className="home-join-row">
+              <input aria-label="Código da sala" value={code} maxLength="6" onChange={(event) => setCode(event.target.value.toUpperCase())} placeholder="ABC123" />
+              <button className="secondary" onClick={join}>Entrar <b>→</b></button>
+            </div>
+          </div>
+          {error && <p className="error home-error">{error}</p>}
+        </div>
+      </div>
+
+      <div className="guess-showcase" aria-hidden="true">
+        <div className="cards-glow" />
+        {showcase.map((card, index) => <article className={`guess-card card-${index + 1} tone-${card.tone} ${card.featured ? 'featured' : ''}`} key={card.name}>
+          <div className="guess-card-head"><strong>{card.name}</strong><span>{card.featured ? '●' : '?'}</span></div>
+          <div className="guess-card-value">{card.value}</div>
+          <div className="guess-card-foot"><span>{card.status}</span><b>{index === 2 ? '≈' : index === 4 ? '+2' : '↗'}</b></div>
+        </article>)}
+      </div>
+    </section>
+  </Shell>;
+}
 function Lobby({ room, me, settings, setSettings, toggleCategory, copyCode, start, starting, exit, error }) { const isHost = me?.isHost; return <Shell exit={exit}><section className="lobby-head"><div><p className="kicker">SUA MESA ESTÁ PRONTA</p><h1>Sala <strong>{room.code}</strong></h1><button className="copy" onClick={copyCode}>▣ Copiar código</button></div><div className="waiting"><span className="pulse" /> aguardando jogadores</div></section><section className="lobby-layout"><div className="panel players-panel"><div className="panel-title"><span>JOGADORES</span><b>{room.players.length}<small>/10</small></b></div><div className="player-list">{room.players.map((player) => <div className="player" key={player.id}><span className="avatar" style={{ background: player.color }}>{player.name.slice(0, 1).toUpperCase()}</span><span>{player.name}{player.id === me?.id && <small> você</small>}</span>{player.isHost && <em>HOST</em>}</div>)}</div><p className="hint">Compartilhe o código com seus amigos para começar.</p></div>{isHost ? <div className="panel config"><div className="panel-title"><span>CONFIGURAÇÕES</span><b>HOST</b></div><div className="option"><span>Rodadas</span><div className="segmented">{[5, 10, 15, 20].map((value) => <button className={settings.rounds === value ? 'active' : ''} onClick={() => setSettings({ ...settings, rounds: value })} key={value}>{value}</button>)}</div></div><div className="option"><span>Tempo por pergunta</span><div className="segmented">{[15, 30, 45, 60].map((value) => <button className={settings.seconds === value ? 'active' : ''} onClick={() => setSettings({ ...settings, seconds: value })} key={value}>{value}s</button>)}</div></div><div className="option categories"><span>Categorias <small>(vazio = todas)</small></span><div className="chips">{categories.map((category) => <button className={settings.categories.includes(category) ? 'selected' : ''} onClick={() => toggleCategory(category)} key={category}>{category}</button>)}</div></div><button className="primary start" disabled={starting} onClick={start}>{starting ? 'Iniciando...' : 'Começar partida'} <b>→</b></button></div> : <div className="panel guest-wait"><div className="orbit">?</div><h2>O host está<br />preparando tudo.</h2><p>Assim que a partida começar, a primeira pergunta aparece aqui.</p></div>}</section>{error && <p className="error centered">{error}</p>}</Shell>; }
 function Question({ room, me, guess, setGuess, submit, sent, secondsLeft, exit, error }) { return <Shell eyebrow={`RODADA ${room.round} / ${room.totalRounds}`} exit={exit}><section className="question-wrap"><div className="question-meta"><span>{room.question.category}</span><div className={`timer ${secondsLeft <= 5 ? 'urgent' : ''}`}><i />00:{String(secondsLeft).padStart(2, '0')}</div></div><h1>{room.question.question}</h1><p className="unit">responda em {room.question.unit}</p><div className="answer-box">{sent ? <div className="sent"><b>✓</b><span>Palpite enviado</span><small>Agora é só torcer.</small></div> : <><div className="guess-input"><input autoFocus type="text" inputMode="decimal" value={guess} onChange={(event) => setGuess(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && submit()} placeholder="Seu palpite" /><span>{room.question.unit}</span></div><button className="primary" onClick={submit}>Confirmar resposta <b>↗</b></button></>} </div><div className="answer-status"><span>{room.players.filter((player) => player.connected).length} jogadores na mesa</span><span>{sent ? 'Sua resposta está guardada em segredo' : 'Você só pode responder uma vez'}</span></div>{error && <p className="error centered">{error}</p>}</section></Shell>; }
 function Result({ room, next, exit, error }) { const result = room.result; return <Shell eyebrow={`RESULTADO · ${room.round} / ${room.totalRounds}`} exit={exit}><section className="result-wrap"><p className="kicker">RESPOSTA CORRETA · {result.category}</p><h1>{number.format(result.answer)} <small>{result.unit}</small></h1><div className="results-list">{result.entries.map((entry, index) => <div className={`result-row ${entry.points ? 'winner' : ''}`} key={entry.id}><b className="rank">{index + 1}</b><span className="avatar mini" style={{ background: entry.color }}>{entry.name.slice(0, 1)}</span><div className="result-name"><strong>{entry.name}</strong>{entry.distance === 0 && <em>ACERTO EXATO</em>}{entry.guess === null && <em>SEM RESPOSTA</em>}</div><span className="guess">{entry.guess === null ? '—' : number.format(entry.guess)}</span><span className="distance">{entry.distance === null ? '—' : `dif. ${number.format(entry.distance)}`}</span><strong className="points">{entry.points ? `+${entry.points}` : ''}</strong></div>)}</div><div className="result-footer"><p>O próximo jogador a fazer história?</p><button className="primary" onClick={next}>{room.round >= room.totalRounds ? 'Ver resultado final' : 'Próxima rodada'} <b>→</b></button></div>{error && <p className="error centered">{error}</p>}</section></Shell>; }

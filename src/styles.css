@@ -24,3 +24,59 @@ body{background:var(--ink)}
 @media(max-width:760px){.home-screen{grid-template-columns:1fr;gap:34px;margin-top:8vh}.home-copy h1{font-size:clamp(50px,16vw,78px)}.fake-board{grid-template-columns:repeat(3,1fr);gap:6px;margin-top:26px}.fake-board span{padding:9px 7px;font-size:8px}.fake-board b{font-size:11px}.game-panel{transform:none;padding:23px}.home-facts{margin-top:34px;justify-content:center;flex-wrap:wrap;gap:9px}.home-facts i{display:none}.home-facts span{font-size:9px}}
 .topbar-actions{display:flex;align-items:center;gap:18px}.quit{background:transparent;border:1px solid #ffffff22;border-radius:7px;color:var(--muted);padding:8px 10px;font:10px 'DM Mono';letter-spacing:.06em;text-transform:uppercase;transition:color .15s,border-color .15s,transform .15s}.quit b{color:var(--coral);font-size:16px;margin-left:5px}.quit:hover{border-color:var(--coral);color:var(--paper);transform:translateY(-2px)}.quit:active{transform:translateY(1px)}
 @media(max-width:760px){.topbar-actions{gap:9px}.quit{padding:7px 8px;font-size:9px}.live-dot{font-size:9px}}
+
+/* Home — layered game-menu composition */
+.home-stage{
+  max-width:1180px;
+  width:100%;
+  height:calc(100vh - 52px);
+  margin:0 auto;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  overflow:visible;
+}
+.home-hero{position:relative;z-index:8;width:min(720px,100%)}
+.home-hero .kicker{margin:0 0 13px;font-size:10px;letter-spacing:.18em}
+.home-hero h1{font-family:'Bowlby One SC',Manrope,sans-serif;font-size:clamp(54px,6.4vw,91px);line-height:.86;letter-spacing:.005em;margin:0;text-transform:uppercase;text-shadow:5px 6px 0 #000}
+.home-hero h1 em{font-style:normal;color:var(--lime);display:inline-block;transform:rotate(-1.5deg);position:relative}
+.home-hero h1 em:after{content:'?';position:absolute;right:-.58em;top:-.08em;color:var(--yellow);font-size:.42em;transform:rotate(11deg);text-shadow:2px 2px 0 #000}
+.home-hero .lede{margin:20px auto 24px;max-width:none;color:#d5d1c9;font-size:15px}
+.home-actions{width:min(590px,100%);margin:0 auto;display:grid;grid-template-columns:1fr 164px;gap:10px;text-align:left;position:relative;z-index:10}
+.nickname-field{display:block}.nickname-field>span,.existing-room>span{display:block;color:var(--yellow);font:800 9px 'DM Mono';letter-spacing:.13em;margin:0 0 7px 2px}
+.nickname-field input,.home-join-row input{width:100%;height:49px;box-sizing:border-box;border:1px solid #ffffff24!important;background:#0c0c11!important;border-radius:9px!important;color:var(--paper);padding:0 15px!important;outline:none;font-size:13px;transition:border-color .18s,box-shadow .18s}
+.nickname-field input:focus,.home-join-row input:focus{border-color:var(--lime)!important;box-shadow:0 0 0 4px #d7f34f18!important}
+.create-room{height:49px;align-self:end;margin:0!important;width:100%!important}
+.existing-room{grid-column:1/-1;margin-top:3px}
+.home-join-row{display:grid;grid-template-columns:1fr 126px;gap:10px}.home-join-row input{font-family:'DM Mono';font-weight:800;letter-spacing:.18em;text-transform:uppercase}.home-join-row .secondary{height:49px;background:#17161d}
+.home-error{grid-column:1/-1;text-align:center;margin:2px 0 0}
+.guess-showcase{
+  height:365px;
+  width:100%;
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:3;
+  perspective:1100px;
+  pointer-events:none;
+  overflow:visible;
+}
+.cards-glow{position:absolute;width:780px;height:240px;left:50%;bottom:-30px;transform:translateX(-50%);background:radial-gradient(ellipse,#62a8ff2d 0%,#d7f34f14 35%,transparent 70%);filter:blur(24px)}
+.guess-card{--card:#777;position:absolute;left:50%;bottom:-42px;width:250px;height:290px;margin-left:-125px;border-radius:24px;padding:18px;box-sizing:border-box;text-align:left;color:#101015;background:var(--card);border:1px solid #ffffff70;box-shadow:0 24px 45px #0009,inset 0 1px 0 #fff8;display:flex;flex-direction:column;justify-content:space-between;transform-origin:50% 100%;animation:homeCardIn .72s cubic-bezier(.2,.85,.2,1) both}
+.guess-card:before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(145deg,#ffffff35,transparent 34%,#00000018);pointer-events:none}
+.tone-violet{--card:#a78bfa}.tone-coral{--card:#ff6b6b}.tone-blue{--card:#59cbea}.tone-green{--card:#62dca2}.tone-yellow{--card:#ffd166}
+.guess-card-head,.guess-card-foot{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}.guess-card-head strong{font-size:17px;letter-spacing:-.03em}.guess-card-head span{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#fff9;font:800 12px 'DM Mono'}.guess-card-value{position:relative;z-index:1;text-align:center;font-family:'Bowlby One SC',Manrope,sans-serif;font-size:42px;letter-spacing:-.04em;text-shadow:0 2px 0 #fff3}.guess-card-foot{font:800 9px 'DM Mono';letter-spacing:.08em}.guess-card-foot b{font-size:22px}
+.card-1{transform:translateX(-420px) translateY(73px) rotate(-12deg)}
+.card-2{transform:translateX(-215px) translateY(43px) rotate(-7deg)}
+.card-3{transform:translateX(0) translateY(13px) rotate(0)}
+.card-4{transform:translateX(215px) translateY(43px) rotate(7deg)}
+.card-5{transform:translateX(420px) translateY(73px) rotate(12deg)}
+.guess-card.featured{box-shadow:0 28px 60px #000b,0 0 60px #59cbea22,inset 0 1px 0 #fff9}.guess-card.featured .guess-card-value{font-size:48px}
+@keyframes homeCardIn{0%{opacity:0;translate:0 180px;scale:.88}100%{opacity:1;translate:0 0;scale:1}}
+.home-stage+.home-facts{margin-top:-7px;position:relative;z-index:12;justify-content:center}
+@media(max-height:850px) and (min-width:761px){.home-stage{margin-top:0;min-height:100dvh -52px}.home-hero h1{font-size:clamp(50px,5.5vw,78px)}.home-hero .lede{margin:14px auto 18px}.guess-showcase{height:310px}.guess-card{height:255px;width:225px;margin-left:-112px}.card-3{height:280px;width:245px;margin-left:-122px}.guess-card-value{font-size:35px}.guess-card.featured .guess-card-value{font-size:41px}}
+@media(max-width:760px){.home-stage{margin-top:5vh;min-height:760px;overflow:hidden}.home-hero h1{font-size:clamp(48px,15vw,70px)}.home-hero h1 em:after{display:none}.home-hero .lede{font-size:13px;margin:16px auto 22px}.home-actions{grid-template-columns:1fr 130px;padding:0 2px}.home-join-row{grid-template-columns:1fr 105px}.guess-showcase{height:300px;bottom:8px;width:720px;left:50%;right:auto;transform:translateX(-50%) scale(.76);transform-origin:50% 100%}.card-1{transform:translateX(-360px) translateY(62px) rotate(-12deg)}.card-2{transform:translateX(-185px) translateY(30px) rotate(-7deg)}.card-4{transform:translateX(185px) translateY(30px) rotate(7deg)}.card-5{transform:translateX(360px) translateY(62px) rotate(12deg)}.home-stage+.home-facts{margin-top:-20px}}
+@media(max-width:430px){.home-stage{min-height:735px}.home-actions{grid-template-columns:1fr}.create-room{grid-row:2}.existing-room{grid-column:1}.guess-showcase{transform:translateX(-50%) scale(.67)}.home-stage+.home-facts{display:none}}
